@@ -43,6 +43,10 @@ namespace FirstAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public ActionResult<VillaDTO> CreateVilla([FromBody]VillaDTO villaDTO)
         {
+            //  if(!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
             if (villaDTO == null)
             {
                 return BadRequest(villaDTO);
