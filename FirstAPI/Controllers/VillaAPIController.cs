@@ -52,7 +52,7 @@ namespace FirstAPI.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody]VillaDTO villaDTO)
+        public ActionResult<VillaDTO> CreateVilla([FromBody]VillaCreateDTO villaDTO)
         {
             //  if(!ModelState.IsValid)
             //{
@@ -69,15 +69,12 @@ namespace FirstAPI.Controllers
                 return BadRequest(villaDTO);
             }
 
-            if(villaDTO.Id > 0)
-            {
-                return  StatusCode(StatusCodes.Status400BadRequest);
-            }
+          
             Villa model = new()
             {
                 Amenity = villaDTO.Amenity,
                 Details = villaDTO.Details,
-                Id = villaDTO.Id,
+          
                 ImageUrl = villaDTO.ImageUrl,
                 Name = villaDTO.Name,
                 Occupancy = villaDTO.Occupancy,
@@ -86,7 +83,7 @@ namespace FirstAPI.Controllers
             };
             _db.Villas.Add(model);
             _db.SaveChanges();
-            return CreatedAtRoute("GetVilla", new { id = villaDTO.Id},villaDTO);
+            return CreatedAtRoute("GetVilla", new { id = model.Id},model);
         }
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -114,7 +111,7 @@ namespace FirstAPI.Controllers
         [HttpPut("{id:int}",Name ="UpdateVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult UpdateVilla(int id,[FromBody] VillaDTO villaDTO)
+        public IActionResult UpdateVilla(int id,[FromBody] VillaUpdateDTO villaDTO)
         {
             if(villaDTO == null || id!=villaDTO.Id)
             {
