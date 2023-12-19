@@ -2,6 +2,7 @@
 using FirstAPI.Models;
 using FirstAPI.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FirstAPI.Controllers
 {
@@ -19,10 +20,10 @@ namespace FirstAPI.Controllers
         }
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<VillaDTO>> GetVillas()
+        public async Task<ActionResult<IEnumerable<VillaDTO>>> GetVillas()
         {
             _logger.LogInformation("Getting All Villas");
-            return Ok(_db.Villas.ToList());
+            return Ok(await _db.Villas.ToListAsync());
         }
 
         [HttpGet("{id:int}", Name ="GetVilla")]
@@ -32,7 +33,7 @@ namespace FirstAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<VillaDTO> GetVilla(int id)
+        public async Task<ActionResult<VillaDTO>> GetVilla(int id)
 
         {
             if (id == 0)
@@ -41,7 +42,7 @@ namespace FirstAPI.Controllers
                 return BadRequest();
             }
 
-            var villa = _db.Villas.FirstOrDefault(u => u.Id == id);
+            var villa = await _db.Villas.FirstOrDefaultAsync(u => u.Id == id);
             if (villa == null)
             {
                 return NotFound();
@@ -52,14 +53,14 @@ namespace FirstAPI.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<VillaDTO> CreateVilla([FromBody]VillaCreateDTO villaDTO)
+        public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody]VillaCreateDTO villaDTO)
         {
             //  if(!ModelState.IsValid)
             //{
             //    return BadRequest(ModelState);
             //}
 
-            if(_db.Villas.FirstOrDefault(u=>u.Name.ToLower() == villaDTO.Name.ToLower())!=null)
+            if(await _db.Villas.FirstOrDefaultAsync(u=>u.Name.ToLower() == villaDTO.Name.ToLower())!=null)
             {
                 ModelState.AddModelError("CustomError", "Villa Already Exist");
                 return BadRequest(ModelState);
@@ -81,29 +82,29 @@ namespace FirstAPI.Controllers
                 Rate = villaDTO.Rate,
                 Sqft = villaDTO.Sqft
             };
-            _db.Villas.Add(model);
-            _db.SaveChanges();
+            await _db.Villas.AddAsync(model);
+            await _db.SaveChangesAsync();
             return CreatedAtRoute("GetVilla", new { id = model.Id},model);
         }
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult DeleteVilla(int id) {
+        public async Task<IActionResult> DeleteVilla(int id) {
 
             if(id == 0)
             {
                 return BadRequest();
             }
 
-            var villa  = _db.Villas.FirstOrDefault(u=>u.Id == id);
+            var villa  = await  _db.Villas.FirstOrDefaultAsync(u=>u.Id == id);
             if(villa == null)
             {
                 return NotFound();
             }
 
             _db.Villas.Remove(villa);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
         
         }
@@ -111,7 +112,7 @@ namespace FirstAPI.Controllers
         [HttpPut("{id:int}",Name ="UpdateVilla")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public IActionResult UpdateVilla(int id,[FromBody] VillaUpdateDTO villaDTO)
+        public async Task<IActionResult> UpdateVilla(int id,[FromBody] VillaUpdateDTO villaDTO)
         {
             if(villaDTO == null || id!=villaDTO.Id)
             {
@@ -129,7 +130,7 @@ namespace FirstAPI.Controllers
                 Sqft = villaDTO.Sqft
             };
             _db.Villas.Update(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
