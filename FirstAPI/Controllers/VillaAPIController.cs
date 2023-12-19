@@ -1,4 +1,5 @@
 ﻿using FirstAPI.Data;
+using FirstAPI.Logging;
 using FirstAPI.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,13 @@ namespace FirstAPI.Controllers
     [ApiController]
     public class VillaAPIController:ControllerBase
     {
-        private readonly ILogger<VillaAPIController> _logger;
-
-        public VillaAPIController(ILogger<VillaAPIController> logger)
+        //private readonly ILogger<VillaAPIController> _logger;
+        private readonly ILogging _logger;
+        //public VillaAPIController(ILogger<VillaAPIController> logger)
+        //{
+        //    this._logger = logger;
+        //}
+        public VillaAPIController(ILogging logger)
         {
             this._logger = logger;
         }
@@ -18,7 +23,8 @@ namespace FirstAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas()
         {
-            _logger.LogInformation("Getting All Villas");
+            //_logger.LogInformation("Getting All Villas");
+            _logger.Log("Getting All Values", "");
             return Ok(VillaStore.villaList);
         }
 
@@ -34,7 +40,8 @@ namespace FirstAPI.Controllers
         {
             if (id == 0)
             {
-                _logger.LogError("Get Villa with Id Error for " +  id);
+                //_logger.LogError("Get Villa with Id Error for " +  id);
+                _logger.Log("Get Villa with Id Error for " +  id, "error");
                 return BadRequest();
             }
 
